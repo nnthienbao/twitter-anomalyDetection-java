@@ -97,6 +97,42 @@ public class DetectAnoms {
             return dataDecomp;
         }
     }
+	
+	public class JNOMSResult {
+		private final double[] dataSeasonal;
+		private final double[] dataDecomp;
+		private final boolean isAnom;
+		private final double thresLow;
+		private final double thresHigh;
+		
+		 private JNOMSResult(double[] dataSeasonal, double[] dataDecomp, boolean isAnom, double thresLow, double thresHigh) {
+			 this.dataSeasonal = dataSeasonal;
+			 this.dataDecomp = dataDecomp;
+			 this.isAnom = isAnom;
+			 this.thresLow = thresLow;
+			 this.thresHigh = thresHigh;
+        }
+
+		public double[] getDataSeasonal() {
+			return dataSeasonal;
+		}
+
+		public double[] getDataDecomp() {
+			return dataDecomp;
+		}
+
+		public boolean isAnom() {
+			return isAnom;
+		}
+
+		public double getThresLow() {
+			return thresLow;
+		}
+
+		public double getThresHigh() {
+			return thresHigh;
+		}
+	}
 
     /** Args:
     #'	series: Time series to perform anomaly detection on.
@@ -232,7 +268,7 @@ public class DetectAnoms {
             return null;
     }
 	
-	private boolean jDetectAnoms(long[] timestamps, double[] series, int window, int mul) {
+	private JNOMSResult jDetectAnoms(long[] timestamps, double[] series, int window, int mul) {
 		if (series == null || series.length < 1) {
             throw new IllegalArgumentException("must supply period length for time series decomposition");
         }
@@ -276,8 +312,9 @@ public class DetectAnoms {
 		
 		double low = medianOfWindow - mul * dataStd;
 		double high = medianOfWindow + mul * dataStd;
-		System.out.println("Last value=" + valueWindows[valueWindows.length - 1] + "\tmedian=" + dataStd + "\tlow=" + low + "\thigh=" + high);
-		return valueWindows[valueWindows.length - 1] < low || valueWindows[valueWindows.length - 1] > high;
+		boolean isAnom = valueWindows[valueWindows.length - 1] < low || valueWindows[valueWindows.length - 1] > high;
+		
+		return new JNOMSResult(data_seasonal, dataForSHESD, isAnom, low, high);
 	}
 
     /**
@@ -311,7 +348,7 @@ public class DetectAnoms {
         return detectAnoms(timestamps, series);
     }
 	
-	public boolean jAnomalyDetection(long[] timestamps, double[] series, int window, int mul) {
+	public JNOMSResult jAnomalyDetection(long[] timestamps, double[] series, int window, int mul) {
 		if (timestamps == null || timestamps.length < 1 || series == null || series.length < 1 || timestamps.length != series.length)
             throw new IllegalArgumentException("The data is empty or has no equal length.");
 		
