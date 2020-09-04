@@ -276,6 +276,7 @@ public class DetectAnoms {
 		
 		double low = medianOfWindow - mul * dataStd;
 		double high = medianOfWindow + mul * dataStd;
+		System.out.println("Last value=" + valueWindows[valueWindows.length - 1] + "\tmedian=" + dataStd + "\tlow=" + low + "\thigh=" + high);
 		return valueWindows[valueWindows.length - 1] < low || valueWindows[valueWindows.length - 1] > high;
 	}
 

@@ -20,7 +20,7 @@ public class JAnomTest {
 	@Test
 	public void test() throws IOException {
 		File folder = new File("src/test/resources/data");
-		System.out.println("folder=" + Arrays.toString(folder.list()));
+//		System.out.println("folder=" + Arrays.toString(folder.list()));
 		String[] list = folder.list();
 		for (String fileName : list) {
 //			String filePath = "data/1_Authen_Com_V3_Viettel_Failed";
