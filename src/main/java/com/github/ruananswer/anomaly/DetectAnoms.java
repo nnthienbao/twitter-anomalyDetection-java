@@ -231,6 +231,53 @@ public class DetectAnoms {
         else
             return null;
     }
+	
+	private boolean jDetectAnoms(long[] timestamps, double[] series, int window, int mul) {
+		if (series == null || series.length < 1) {
+            throw new IllegalArgumentException("must supply period length for time series decomposition");
+        }
+        int numberOfObservations = series.length;
+        /**
+         * use StlDec function
+         * first interpolation to solve problem data to much
+         */
+        // -- Step 1: Decompose data. This returns a univarite remainder which will be used for anomaly detection. Optionally, we might NOT decompose.
+        STLResult data = removeSeasonality(timestamps, series, config.getNumObsPerPeriod());
+        double[] data_seasonal = data.getSeasonal();
+
+        // Remove the seasonal component, and the median of the data to create the univariate remainder
+        double[] dataForSHESD = new double[numberOfObservations];
+
+        QuickMedians quickMedian = new QuickMedians(series);
+        double medianOfSeries = quickMedian.getMedian();//median.evaluate(series);
+
+        // if the data of has no seasonality, directed use the raw_data into function S-H-ESD !!!
+        for (int i = 0; i < numberOfObservations; ++i) {
+            dataForSHESD[i] = series[i] - data_seasonal[i] - medianOfSeries;
+        }
+		
+		long[] tsWindows = new long[window];
+		double[] valueWindows = new double[window];
+		for (int i = numberOfObservations - window, j = 0; i < numberOfObservations; i++,j++) {
+			tsWindows[j] = timestamps[i];
+			valueWindows[j] = dataForSHESD[i];
+		}
+		
+		// use mad replace the variance
+        // double dataStd = Math.sqrt(stat.getPopulationVariance());//Math.sqrt(variance.evaluate(dataForSHESD));
+		QuickMedians quickMedianWindow = new QuickMedians(valueWindows);
+        double medianOfWindow = quickMedianWindow.getMedian();//median.evaluate(series);
+        double[] tempDataForMad = new double[valueWindows.length];
+        for (int i = 0; i < valueWindows.length; ++i) {
+            tempDataForMad[i] = Math.abs(dataForSHESD[i] - medianOfWindow);
+        }
+        QuickMedians quickMedian2 = new QuickMedians(tempDataForMad);
+        double dataStd = quickMedian2.getMedian();
+		
+		double low = medianOfWindow - mul * dataStd;
+		double high = medianOfWindow + mul * dataStd;
+		return valueWindows[valueWindows.length - 1] < low || valueWindows[valueWindows.length - 1] > high;
+	}
 
     /**
      #' @name AnomalyDetectionTs
@@ -262,6 +309,13 @@ public class DetectAnoms {
 
         return detectAnoms(timestamps, series);
     }
+	
+	public boolean jAnomalyDetection(long[] timestamps, double[] series, int window, int mul) {
+		if (timestamps == null || timestamps.length < 1 || series == null || series.length < 1 || timestamps.length != series.length)
+            throw new IllegalArgumentException("The data is empty or has no equal length.");
+		
+		return jDetectAnoms(timestamps, series, window, mul);
+	}
 
     private STLResult removeSeasonality(long[] timestamps, double[] series, int seasonality) {
         STLDecomposition.Config config = new STLDecomposition.Config();
