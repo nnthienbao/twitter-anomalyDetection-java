@@ -46,7 +46,7 @@ public class JAnomTest {
 				for (int i = 0; i < values.length; i++) {
 					lineSeaonals += timestamps[i] + "," + anomResult.getDataSeasonal()[i] + "\n";
 				}
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/result_seasonal/" + fileName + "_Seasonal"), false)) {
+				try (FileWriter writer = new FileWriter(new File("src/test/resources/alert/result_seasonal/" + fileName + "_Seasonal"), false)) {
 					writer.write(lineSeaonals);
 				}
 				
@@ -54,13 +54,35 @@ public class JAnomTest {
 				for (int i = 0; i < values.length; i++) {
 					lineResidual += timestamps[i] + "," + anomResult.getDataDecomp()[i] + "\n";
 				}
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/result_residual/" + fileName + "_Residual"), false)) {
+				try (FileWriter writer = new FileWriter(new File("src/test/resources/alert/result_residual/" + fileName + "_Residual"), false)) {
 					writer.write(lineResidual);
 				}
 				
 				String lineThreshold = "low,high" + "\n";
 				lineThreshold += anomResult.getThresLow() + "," + anomResult.getThresHigh();
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/threshold/" + fileName + "_threshold"), false)) {
+				try (FileWriter writer = new FileWriter(new File("src/test/resources/alert/threshold/" + fileName + "_threshold"), false)) {
+					writer.write(lineThreshold);
+				}
+			} else {
+				String lineSeaonals = "TS,Value" + "\n";
+				for (int i = 0; i < values.length; i++) {
+					lineSeaonals += timestamps[i] + "," + anomResult.getDataSeasonal()[i] + "\n";
+				}
+				try (FileWriter writer = new FileWriter(new File("src/test/resources/normal/result_seasonal/" + fileName + "_Seasonal"), false)) {
+					writer.write(lineSeaonals);
+				}
+				
+				String lineResidual = "TS,Value" + "\n";
+				for (int i = 0; i < values.length; i++) {
+					lineResidual += timestamps[i] + "," + anomResult.getDataDecomp()[i] + "\n";
+				}
+				try (FileWriter writer = new FileWriter(new File("src/test/resources/normal/result_residual/" + fileName + "_Residual"), false)) {
+					writer.write(lineResidual);
+				}
+				
+				String lineThreshold = "low,high" + "\n";
+				lineThreshold += anomResult.getThresLow() + "," + anomResult.getThresHigh();
+				try (FileWriter writer = new FileWriter(new File("src/test/resources/normal/threshold/" + fileName + "_threshold"), false)) {
 					writer.write(lineThreshold);
 				}
 			}
