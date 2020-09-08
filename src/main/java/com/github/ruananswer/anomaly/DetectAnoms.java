@@ -268,7 +268,7 @@ public class DetectAnoms {
             return null;
     }
 	
-	private JNOMSResult jDetectAnoms(long[] timestamps, double[] series, int window, int mul) {
+	private JNOMSResult jDetectAnoms(long[] timestamps, double[] series, int window, int mul, boolean hibrid) {
 		if (series == null || series.length < 1) {
             throw new IllegalArgumentException("must supply period length for time series decomposition");
         }
@@ -299,19 +299,26 @@ public class DetectAnoms {
 			valueWindows[j] = dataForSHESD[i];
 		}
 		
-		// use mad replace the variance
-        // double dataStd = Math.sqrt(stat.getPopulationVariance());//Math.sqrt(variance.evaluate(dataForSHESD));
-		QuickMedians quickMedianWindow = new QuickMedians(valueWindows);
-        double medianOfWindow = quickMedianWindow.getMedian();//median.evaluate(series);
-        double[] tempDataForMad = new double[valueWindows.length];
-        for (int i = 0; i < valueWindows.length; ++i) {
-            tempDataForMad[i] = Math.abs(dataForSHESD[i] - medianOfWindow);
-        }
-        QuickMedians quickMedian2 = new QuickMedians(tempDataForMad);
-        double dataStd = quickMedian2.getMedian();
+		double location = 0d, range = 0d;
+		if (hibrid) {
+			// use mad replace the variance
+			// double dataStd = Math.sqrt(stat.getPopulationVariance());//Math.sqrt(variance.evaluate(dataForSHESD));
+			QuickMedians quickMedianWindow = new QuickMedians(valueWindows);
+			location = quickMedianWindow.getMedian();//median.evaluate(series);
+			double[] tempDataForMad = new double[valueWindows.length];
+			for (int i = 0; i < valueWindows.length; ++i) {
+				tempDataForMad[i] = Math.abs(dataForSHESD[i] - location);
+			}
+			QuickMedians quickMedian2 = new QuickMedians(tempDataForMad);
+			range = quickMedian2.getMedian();
+		} else {
+			OnlineNormalStatistics stat = new OnlineNormalStatistics(valueWindows);
+			location = stat.getMean();
+			range = Math.sqrt(stat.getPopulationVariance());
+		}
 		
-		double low = medianOfWindow - mul * dataStd;
-		double high = medianOfWindow + mul * dataStd;
+		double low = location - mul * range;
+		double high = location + mul * range;
 		boolean isAnom = valueWindows[valueWindows.length - 1] < low || valueWindows[valueWindows.length - 1] > high;
 		
 		return new JNOMSResult(data_seasonal, dataForSHESD, isAnom, low, high);
@@ -348,7 +355,7 @@ public class DetectAnoms {
         return detectAnoms(timestamps, series);
     }
 	
-	public JNOMSResult jAnomalyDetection(long[] timestamps, double[] series, int window, int mul) {
+	public JNOMSResult jAnomalyDetection(long[] timestamps, double[] series, int window, int mul, boolean hibrid) {
 		if (timestamps == null || timestamps.length < 1 || series == null || series.length < 1 || timestamps.length != series.length)
             throw new IllegalArgumentException("The data is empty or has no equal length.");
 		

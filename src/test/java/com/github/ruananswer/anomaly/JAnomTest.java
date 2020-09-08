@@ -39,7 +39,7 @@ public class JAnomTest {
 			DetectAnoms.Config config = new DetectAnoms.Config();
 			config.setNumObsPerPeriod(1440);
 			DetectAnoms detectAnoms = new DetectAnoms(config);
-			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3);
+			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3, false);
 
 			if (anomResult.isAnom()) {
 				String lineSeaonals = "TS,Value" + "\n";
