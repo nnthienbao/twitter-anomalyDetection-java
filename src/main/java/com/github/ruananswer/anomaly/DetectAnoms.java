@@ -359,7 +359,7 @@ public class DetectAnoms {
 		if (timestamps == null || timestamps.length < 1 || series == null || series.length < 1 || timestamps.length != series.length)
             throw new IllegalArgumentException("The data is empty or has no equal length.");
 		
-		return jDetectAnoms(timestamps, series, window, mul);
+		return jDetectAnoms(timestamps, series, window, mul, hibrid);
 	}
 
     private STLResult removeSeasonality(long[] timestamps, double[] series, int seasonality) {
