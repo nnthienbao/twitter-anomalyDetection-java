@@ -20,14 +20,17 @@ public class JAnomTest {
 
 	@Test
 	public void test() throws IOException {
-		String folderPath = "src/test/resources/data/lowreq";
+		String folderPath = "src/test/resources/data/unstable";
 		File folder = new File(folderPath);
 //		System.out.println("folder=" + Arrays.toString(folder.list()));
 		String[] list = folder.list();
 		for (String fileName : list) {
-			System.out.println("Test: " + fileName);
-//			String filePath = "data/1_Authen_Com_V3_Viettel_Failed";
-			String[] lines = TestCommon.getResourceAsString(folderPath + "/" + fileName).split("\n");
+			String filePath = folderPath + "/" + fileName;
+			System.out.println("Test: " + filePath);
+			String data = TestCommon.getResourceAsString(filePath);
+			if (data == null) continue;
+			
+			String[] lines = data.split("\n");
 			long[] timestamps = new long[lines.length - 1];
 			double[] values = new double[lines.length - 1];
 			for (int i = 1; i < lines.length; i++) {
