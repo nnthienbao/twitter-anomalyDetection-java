@@ -20,13 +20,14 @@ public class JAnomTest {
 
 	@Test
 	public void test() throws IOException {
-		File folder = new File("src/test/resources/data");
+		String folderPath = "src/test/resources/data/lowreq";
+		File folder = new File(folderPath);
 //		System.out.println("folder=" + Arrays.toString(folder.list()));
 		String[] list = folder.list();
 		for (String fileName : list) {
 			System.out.println("Test: " + fileName);
 //			String filePath = "data/1_Authen_Com_V3_Viettel_Failed";
-			String[] lines = TestCommon.getResourceAsString("data/" + fileName).split("\n");
+			String[] lines = TestCommon.getResourceAsString(folderPath + "/" + fileName).split("\n");
 			long[] timestamps = new long[lines.length - 1];
 			double[] values = new double[lines.length - 1];
 			for (int i = 1; i < lines.length; i++) {
@@ -46,7 +47,7 @@ public class JAnomTest {
 				for (int i = 0; i < values.length; i++) {
 					lineSeaonals += timestamps[i] + "," + anomResult.getDataSeasonal()[i] + "\n";
 				}
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/alert/result_seasonal/" + fileName + "_Seasonal"), false)) {
+				try (FileWriter writer = new FileWriter(new File(folderPath + "/alert/result_seasonal/" + fileName + "_Seasonal"), false)) {
 					writer.write(lineSeaonals);
 				}
 				
@@ -54,13 +55,13 @@ public class JAnomTest {
 				for (int i = 0; i < values.length; i++) {
 					lineResidual += timestamps[i] + "," + anomResult.getDataDecomp()[i] + "\n";
 				}
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/alert/result_residual/" + fileName + "_Residual"), false)) {
+				try (FileWriter writer = new FileWriter(new File(folderPath + "/alert/result_residual/" + fileName + "_Residual"), false)) {
 					writer.write(lineResidual);
 				}
 				
 				String lineThreshold = "low,high" + "\n";
 				lineThreshold += anomResult.getThresLow() + "," + anomResult.getThresHigh();
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/alert/threshold/" + fileName + "_threshold"), false)) {
+				try (FileWriter writer = new FileWriter(new File(folderPath + "/alert/threshold/" + fileName + "_threshold"), false)) {
 					writer.write(lineThreshold);
 				}
 			} else {
@@ -68,7 +69,7 @@ public class JAnomTest {
 				for (int i = 0; i < values.length; i++) {
 					lineSeaonals += timestamps[i] + "," + anomResult.getDataSeasonal()[i] + "\n";
 				}
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/normal/result_seasonal/" + fileName + "_Seasonal"), false)) {
+				try (FileWriter writer = new FileWriter(new File(folderPath + "/normal/result_seasonal/" + fileName + "_Seasonal"), false)) {
 					writer.write(lineSeaonals);
 				}
 				
@@ -76,13 +77,13 @@ public class JAnomTest {
 				for (int i = 0; i < values.length; i++) {
 					lineResidual += timestamps[i] + "," + anomResult.getDataDecomp()[i] + "\n";
 				}
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/normal/result_residual/" + fileName + "_Residual"), false)) {
+				try (FileWriter writer = new FileWriter(new File(folderPath + "/normal/result_residual/" + fileName + "_Residual"), false)) {
 					writer.write(lineResidual);
 				}
 				
 				String lineThreshold = "low,high" + "\n";
 				lineThreshold += anomResult.getThresLow() + "," + anomResult.getThresHigh();
-				try (FileWriter writer = new FileWriter(new File("src/test/resources/normal/threshold/" + fileName + "_threshold"), false)) {
+				try (FileWriter writer = new FileWriter(new File(folderPath + "/normal/threshold/" + fileName + "_threshold"), false)) {
 					writer.write(lineThreshold);
 				}
 			}
