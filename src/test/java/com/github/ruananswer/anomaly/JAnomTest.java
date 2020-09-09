@@ -6,7 +6,6 @@
 package com.github.ruananswer.anomaly;
 
 import com.github.ruananswer.testUtility.TestCommon;
-import com.github.ruananswer.utils.JsonUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -43,7 +42,7 @@ public class JAnomTest {
 			DetectAnoms.Config config = new DetectAnoms.Config();
 			config.setNumObsPerPeriod(1440);
 			DetectAnoms detectAnoms = new DetectAnoms(config);
-			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3, false);
+			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3, true);
 
 			if (anomResult.isAnom()) {
 				String lineSeaonals = "TS,Value" + "\n";
