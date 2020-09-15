@@ -307,7 +307,7 @@ public class DetectAnoms {
 			location = quickMedianWindow.getMedian();//median.evaluate(series);
 			double[] tempDataForMad = new double[valueWindows.length];
 			for (int i = 0; i < valueWindows.length; ++i) {
-				tempDataForMad[i] = Math.abs(dataForSHESD[i] - location);
+				tempDataForMad[i] = Math.abs(valueWindows[i] - location);
 			}
 			QuickMedians quickMedian2 = new QuickMedians(tempDataForMad);
 			range = quickMedian2.getMedian();
