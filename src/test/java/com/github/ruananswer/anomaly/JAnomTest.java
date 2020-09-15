@@ -19,7 +19,7 @@ public class JAnomTest {
 
 	@Test
 	public void test() throws IOException {
-		String folderPath = "src/test/resources/data/normal";
+		String folderPath = "src/test/resources/data/unstable";
 		File folder = new File(folderPath);
 //		System.out.println("folder=" + Arrays.toString(folder.list()));
 		String[] list = folder.list();
