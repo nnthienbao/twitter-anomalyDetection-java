@@ -20,7 +20,7 @@ public class JAnomTest {
 
 	@Test
 	public void test() throws IOException {
-		String folderPath = "src/test/resources/data/unstable";
+		String folderPath = "src/test/resources/data/lowreq";
 		File folder = new File(folderPath);
 //		System.out.println("folder=" + Arrays.toString(folder.list()));
 		String[] list = folder.list();
@@ -28,8 +28,10 @@ public class JAnomTest {
 			String filePath = folderPath + "/" + fileName;
 			System.out.println("Test: " + filePath);
 			String data = TestCommon.getResourceAsString(filePath);
-			if (data == null) continue;
-			
+			if (data == null) {
+				continue;
+			}
+
 			String[] lines = data.split("\n");
 			long[] timestamps = new long[lines.length - 1];
 			double[] values = new double[lines.length - 1];
@@ -43,7 +45,7 @@ public class JAnomTest {
 			DetectAnoms.Config config = new DetectAnoms.Config();
 			config.setNumObsPerPeriod(1440);
 			DetectAnoms detectAnoms = new DetectAnoms(config);
-			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3, false);
+			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3, true);
 
 			if (anomResult.isAnom()) {
 				String lineSeaonals = "TS,Value" + "\n";
@@ -53,7 +55,7 @@ public class JAnomTest {
 				try (FileWriter writer = new FileWriter(new File(folderPath + "/alert/result_seasonal/" + fileName + "_Seasonal"), false)) {
 					writer.write(lineSeaonals);
 				}
-				
+
 				String lineResidual = "TS,Value" + "\n";
 				for (int i = 0; i < values.length; i++) {
 					lineResidual += timestamps[i] + "," + anomResult.getDataDecomp()[i] + "\n";
@@ -61,7 +63,7 @@ public class JAnomTest {
 				try (FileWriter writer = new FileWriter(new File(folderPath + "/alert/result_residual/" + fileName + "_Residual"), false)) {
 					writer.write(lineResidual);
 				}
-				
+
 				String lineThreshold = "low,high" + "\n";
 				lineThreshold += anomResult.getThresLow() + "," + anomResult.getThresHigh();
 				try (FileWriter writer = new FileWriter(new File(folderPath + "/alert/threshold/" + fileName + "_threshold"), false)) {
@@ -75,7 +77,7 @@ public class JAnomTest {
 				try (FileWriter writer = new FileWriter(new File(folderPath + "/normal/result_seasonal/" + fileName + "_Seasonal"), false)) {
 					writer.write(lineSeaonals);
 				}
-				
+
 				String lineResidual = "TS,Value" + "\n";
 				for (int i = 0; i < values.length; i++) {
 					lineResidual += timestamps[i] + "," + anomResult.getDataDecomp()[i] + "\n";
@@ -83,7 +85,7 @@ public class JAnomTest {
 				try (FileWriter writer = new FileWriter(new File(folderPath + "/normal/result_residual/" + fileName + "_Residual"), false)) {
 					writer.write(lineResidual);
 				}
-				
+
 				String lineThreshold = "low,high" + "\n";
 				lineThreshold += anomResult.getThresLow() + "," + anomResult.getThresHigh();
 				try (FileWriter writer = new FileWriter(new File(folderPath + "/normal/threshold/" + fileName + "_threshold"), false)) {
