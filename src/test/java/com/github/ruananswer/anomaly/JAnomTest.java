@@ -20,7 +20,7 @@ public class JAnomTest {
 
 	@Test
 	public void test() throws IOException {
-		String folderPath = "src/test/resources/data/lowreq";
+		String folderPath = "src/test/resources/data/normal";
 		File folder = new File(folderPath);
 //		System.out.println("folder=" + Arrays.toString(folder.list()));
 		String[] list = folder.list();
@@ -45,7 +45,7 @@ public class JAnomTest {
 			DetectAnoms.Config config = new DetectAnoms.Config();
 			config.setNumObsPerPeriod(1440);
 			DetectAnoms detectAnoms = new DetectAnoms(config);
-			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3, true);
+			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 2, true);
 
 			if (anomResult.isAnom()) {
 				String lineSeaonals = "TS,Value" + "\n";
