@@ -319,7 +319,7 @@ public class DetectAnoms {
 			OnlineNormalStatistics stat = new OnlineNormalStatistics(valueWindows);
 			location = stat.getMean();
 			range = Math.sqrt(stat.getPopulationVariance());
-			if (Math.abs(range) <= 0.0001) {
+			if (Math.abs(range) <= 0.001) {
 				isLowStd = true;
 			}
 		}
