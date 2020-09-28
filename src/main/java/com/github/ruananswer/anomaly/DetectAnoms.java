@@ -300,6 +300,7 @@ public class DetectAnoms {
 		}
 		
 		double location = 0d, range = 0d;
+		boolean isLowStd = false;
 		if (hibrid) {
 			// use mad replace the variance
 			// double dataStd = Math.sqrt(stat.getPopulationVariance());//Math.sqrt(variance.evaluate(dataForSHESD));
@@ -311,17 +312,23 @@ public class DetectAnoms {
 			}
 			QuickMedians quickMedian2 = new QuickMedians(tempDataForMad);
 			range = quickMedian2.getMedian();
+			if (Math.abs(range) <= 1e-10) {
+				isLowStd = true;
+			}
 		} else {
 			OnlineNormalStatistics stat = new OnlineNormalStatistics(valueWindows);
 			location = stat.getMean();
 			range = Math.sqrt(stat.getPopulationVariance());
+			if (Math.abs(range) <= 0.0001) {
+				isLowStd = true;
+			}
 		}
 		
 		double low = location - mul * range;
 		double high = location + mul * range;
 		boolean isAnom = valueWindows[valueWindows.length - 1] < low || valueWindows[valueWindows.length - 1] > high;
 		
-		return new JNOMSResult(data_seasonal, dataForSHESD, isAnom, low, high);
+		return new JNOMSResult(data_seasonal, dataForSHESD, isAnom && !isLowStd, low, high);
 	}
 
     /**
