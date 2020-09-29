@@ -104,15 +104,23 @@ public class DetectAnoms {
 		private final boolean isAnom;
 		private final double thresLow;
 		private final double thresHigh;
+		private final double[] valueWindows;
+		private final long[] timestamp;
+		private final double[] series;
+		private final double std;
 		
-		 private JNOMSResult(double[] dataSeasonal, double[] dataDecomp, boolean isAnom, double thresLow, double thresHigh) {
+		 private JNOMSResult(double[] dataSeasonal, double[] dataDecomp, boolean isAnom, double thresLow, double thresHigh, double[] valueWindows, long[] timestamp, double[] series, double std) {
 			 this.dataSeasonal = dataSeasonal;
 			 this.dataDecomp = dataDecomp;
 			 this.isAnom = isAnom;
 			 this.thresLow = thresLow;
 			 this.thresHigh = thresHigh;
+			 this.valueWindows = valueWindows;
+			 this.timestamp = timestamp;
+			 this.series = series;
+			 this.std = std;
         }
-
+		 
 		public double[] getDataSeasonal() {
 			return dataSeasonal;
 		}
@@ -131,6 +139,26 @@ public class DetectAnoms {
 
 		public double getThresHigh() {
 			return thresHigh;
+		}
+
+		public boolean isIsAnom() {
+			return isAnom;
+		}
+
+		public double[] getValueWindows() {
+			return valueWindows;
+		}
+
+		public long[] getTimestamp() {
+			return timestamp;
+		}
+
+		public double[] getSeries() {
+			return series;
+		}
+
+		public double getStd() {
+			return std;
 		}
 	}
 
@@ -319,16 +347,20 @@ public class DetectAnoms {
 			OnlineNormalStatistics stat = new OnlineNormalStatistics(valueWindows);
 			location = stat.getMean();
 			range = Math.sqrt(stat.getPopulationVariance());
-			if (Math.abs(range) <= 0.001) {
+			if (Math.abs(range) <= 0.1) {
 				isLowStd = true;
 			}
 		}
 		
+		double std = Math.abs(range);
+		
 		double low = location - mul * range;
 		double high = location + mul * range;
-		boolean isAnom = valueWindows[valueWindows.length - 1] < low || valueWindows[valueWindows.length - 1] > high;
+		boolean isAnom = (valueWindows[valueWindows.length - 1] < low && valueWindows[valueWindows.length - 2] < low)
+				||
+				(valueWindows[valueWindows.length - 1] > high && valueWindows[valueWindows.length - 2] > high);
 		
-		return new JNOMSResult(data_seasonal, dataForSHESD, isAnom && !isLowStd, low, high);
+		return new JNOMSResult(data_seasonal, dataForSHESD, isAnom && !isLowStd, low, high, valueWindows, timestamps, series, std);
 	}
 
     /**
