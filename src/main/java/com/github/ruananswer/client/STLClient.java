@@ -13,10 +13,10 @@ import com.github.ruananswer.anomaly.DetectAnoms;
  */
 public class STLClient {
 
-	public DetectAnoms.JNOMSResult detectAnom(int numObsPerPeriod, long[] timestamps, double[] series, int window, int mul, boolean hibrid) {
+	public DetectAnoms.JNOMSResult detectAnom(int numObsPerPeriod, long[] timestamps, double[] series, int window, int mul, boolean hibrid, int numPointToCheck) {
 		DetectAnoms.Config config = new DetectAnoms.Config();
 		config.setNumObsPerPeriod(numObsPerPeriod);
 		DetectAnoms detectAnoms = new DetectAnoms(config);
-		return detectAnoms.jAnomalyDetection(timestamps, series, window, mul, hibrid);
+		return detectAnoms.jAnomalyDetection(timestamps, series, window, mul, hibrid, numPointToCheck);
 	}
 }

@@ -296,7 +296,7 @@ public class DetectAnoms {
             return null;
     }
 	
-	private JNOMSResult jDetectAnoms(long[] timestamps, double[] series, int window, int mul, boolean hibrid) {
+	private JNOMSResult jDetectAnoms(long[] timestamps, double[] series, int window, int mul, boolean hibrid, int numPointToCheck) {
 		if (series == null || series.length < 1) {
             throw new IllegalArgumentException("must supply period length for time series decomposition");
         }
@@ -356,13 +356,24 @@ public class DetectAnoms {
 		
 		double low = location - mul * range;
 		double high = location + mul * range;
-		boolean isAnom = (valueWindows[valueWindows.length - 1] < low && valueWindows[valueWindows.length - 2] < low)
-				||
-				(valueWindows[valueWindows.length - 1] > high && valueWindows[valueWindows.length - 2] > high);
+//		boolean isAnom = (valueWindows[valueWindows.length - 1] < low && valueWindows[valueWindows.length - 2] < low)
+//				||
+//				(valueWindows[valueWindows.length - 1] > high && valueWindows[valueWindows.length - 2] > high);
+//		boolean isAnom = valueWindows[valueWindows.length - 1] < low || valueWindows[valueWindows.length - 1] > high;
+		boolean isAnom = isAlert(valueWindows, low, high, numPointToCheck);
 		
 		return new JNOMSResult(data_seasonal, dataForSHESD, isAnom && !isLowStd, low, high, valueWindows, timestamps, series, std);
 	}
 
+	public static boolean isAlert (double[] valueWindows, double low, double high ,int numPointToCheck) {
+		for (int i = 1; i <= numPointToCheck; i++) {
+			boolean alert = valueWindows[valueWindows.length - i] < low || valueWindows[valueWindows.length - i] > high;
+			if (!alert) {
+				return false;
+			}
+		}
+		return true;
+	}
     /**
      #' @name AnomalyDetectionTs
      #' @param timestamps & series Time series as a two column data frame where the first column consists of the
@@ -394,11 +405,11 @@ public class DetectAnoms {
         return detectAnoms(timestamps, series);
     }
 	
-	public JNOMSResult jAnomalyDetection(long[] timestamps, double[] series, int window, int mul, boolean hibrid) {
+	public JNOMSResult jAnomalyDetection(long[] timestamps, double[] series, int window, int mul, boolean hibrid, int numPointToCheck) {
 		if (timestamps == null || timestamps.length < 1 || series == null || series.length < 1 || timestamps.length != series.length)
             throw new IllegalArgumentException("The data is empty or has no equal length.");
 		
-		return jDetectAnoms(timestamps, series, window, mul, hibrid);
+		return jDetectAnoms(timestamps, series, window, mul, hibrid, numPointToCheck);
 	}
 
     private STLResult removeSeasonality(long[] timestamps, double[] series, int seasonality) {

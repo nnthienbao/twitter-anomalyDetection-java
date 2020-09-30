@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
  */
 public class TestRedisTimeSeries {
 
-	@Test
+//	@Test
 	public void addSeries() throws IOException {
 		String filePath = "src/test/resources/redis_ts_data/send_success_30day.txt";
 		String data = TestCommon.getResourceAsString(filePath);

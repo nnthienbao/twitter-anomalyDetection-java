@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
  */
 public class JAnomTest {
 
-	@Test
+//	@Test
 	public void test() throws IOException {
 		String folderPath = "src/test/resources/data/lowreq";
 		File folder = new File(folderPath);
@@ -45,7 +45,8 @@ public class JAnomTest {
 			DetectAnoms.Config config = new DetectAnoms.Config();
 			config.setNumObsPerPeriod(1440);
 			DetectAnoms detectAnoms = new DetectAnoms(config);
-			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3, true);
+			int numPointToCheck = 2;
+			DetectAnoms.JNOMSResult anomResult = detectAnoms.jAnomalyDetection(timestamps, values, 30, 3, true, numPointToCheck);
 
 			if (anomResult.isAnom()) {
 				String lineSeaonals = "TS,Value" + "\n";
